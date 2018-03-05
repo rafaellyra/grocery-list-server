@@ -1,0 +1,16 @@
+type Query {
+    groceriesList(id: ID): List
+    groceriesLists: [List]
+}
+
+type List {
+    listName: String
+    id: ID
+}
+
+type Mutation {
+    createList (
+        listName: String!
+        id: ID
+    ): List
+}
