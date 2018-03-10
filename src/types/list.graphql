@@ -1,16 +1,23 @@
-type Query {
-    groceriesList(id: ID): List
-    groceriesLists: [List]
+type List {
+    id: ID
+    items: [ListItem]
+    name: String
 }
 
-type List {
-    listName: String
-    id: ID
+type ListItem {
+    checked: Boolean
+    id: ID,
+    listId: ID
+    name: String
 }
 
 type Mutation {
-    createList (
-        listName: String!
-        id: ID
-    ): List
+    addItemToList (id: ID, name: String!, listId: ID): ListItem
+    createList (name: String!, id: ID): List
+}
+
+type Query {
+    groceriesList(id: ID): List
+    groceriesListItems(listId: ID): [ListItem]
+    groceriesLists: [List]
 }
