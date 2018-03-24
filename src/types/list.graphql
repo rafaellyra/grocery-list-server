@@ -12,8 +12,9 @@ type ListItem {
 }
 
 type Mutation {
-    addItemToList (id: ID, name: String!, listId: ID): ListItem
-    createList (name: String!, id: ID): List
+    addItemToList(id: ID, name: String!, listId: ID): ListItem
+    createList(name: String!, id: ID): List
+    toggleListItem(id: ID, checked: Boolean): ListItem
 }
 
 type Query {

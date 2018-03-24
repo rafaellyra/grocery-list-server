@@ -79,6 +79,14 @@ export default {
                     else resolve(list)
                 })
             })
+        },
+        toggleListItem: (_, { id, checked }): Item => {
+            return new Promise((resolve) => {
+                ListItem.findByIdAndUpdate(id, { 'checked': checked }, { new: true }, (err, item) => {
+                    if(err) reject(err)
+                    else resolve(item)
+                })
+            })
         }
     }
 }
