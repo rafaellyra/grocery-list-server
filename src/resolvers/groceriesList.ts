@@ -24,9 +24,9 @@ export default {
     Query: {
         groceriesLists: (): List[] => {
             return new Promise((resolve) => {
-                GroceriesList.find((err, list) => {
+                GroceriesList.find((err, lists) => {
                     if (err) reject(err)
-                    else resolve(list)
+                    else resolve(lists)
                 })
             })
         },
@@ -76,6 +76,14 @@ export default {
                     name: name
                 }).save((err, list) => {
                     if (err) reject(err)
+                    else resolve(list)
+                })
+            })
+        },
+        removeList: (_, { id }): List => {
+            return new Promise((resolve) => {
+                GroceriesList.findOneAndRemove({ _id: id }, (err, list) => {
+                    if(err) reject(err)
                     else resolve(list)
                 })
             })
