@@ -1,4 +1,8 @@
+scalar Date
+
 type List {
+    archived: Boolean
+    createdAt: Date,
     id: ID
     items: [ListItem]
     name: String
@@ -13,12 +17,13 @@ type ListItem {
 
 type Mutation {
     addItemToList(id: ID, name: String!, listId: ID): ListItem
+    archiveList(id: ID): List
     createList(name: String!, id: ID): List
-    removeList(id: ID): List
     toggleListItem(id: ID, checked: Boolean): ListItem
 }
 
 type Query {
+    archivedLists: [List]
     groceriesList(id: ID): List
     groceriesListItems(listId: ID): [ListItem]
     groceriesLists: [List]

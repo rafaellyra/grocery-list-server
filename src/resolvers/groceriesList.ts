@@ -5,6 +5,8 @@ let connection = mongoose.createConnection('mongodb://localhost:27017/groceriesL
 autoIncrement.initialize(connection)
 
 let listSchema = new mongoose.Schema({
+    archived: { type: Boolean, required: false },
+    createdAt: { type: Date, required: true },
     name: { type: String, required: true }
 });
 listSchema.plugin(autoIncrement.plugin, 'List');
@@ -21,10 +23,32 @@ const ListItem = connection.model('items', listItemSchema)
 
 
 export default {
+    Date: {
+        __parseValue(value) {
+            return new Date(value); // value from the client
+        },
+        __serialize(value) {
+            return value.getTime(); // value sent to the client
+        },
+        __parseLiteral(ast) {
+            if (ast.kind === Kind.INT) {
+                return parseInt(ast.value, 10); // ast value is always in string format
+            }
+            return null;
+        }
+    },
     Query: {
+        archivedLists: (): List[] => {
+            return new Promise((resolve) => {
+                GroceriesList.find({ 'archived': true }, (err, lists) => {
+                    if (err) reject(err)
+                    else resolve(lists)
+                })
+            })
+        },
         groceriesLists: (): List[] => {
             return new Promise((resolve) => {
-                GroceriesList.find((err, lists) => {
+                GroceriesList.find({ 'archived': false }, (err, lists) => {
                     if (err) reject(err)
                     else resolve(lists)
                 })
@@ -42,7 +66,9 @@ export default {
             return new Promise((resolve) => {
                 GroceriesList.findById(args.id, (err, list) => {
                     if (err) reject(err)
-                    else resolve(list)
+                    else {
+                        resolve(list)
+                    }
                 })
             })
         }
@@ -70,20 +96,23 @@ export default {
                 })
             })
         },
-        createList: (_, { name }): List => {
+        archiveList: (_, { id }): List => {
             return new Promise((resolve) => {
-                new GroceriesList({
-                    name: name
-                }).save((err, list) => {
-                    if (err) reject(err)
+                GroceriesList.findByIdAndUpdate(id, { 'archived': true }, { new: true }, (err, list) => {
+                    if(err) reject(err)
                     else resolve(list)
                 })
             })
         },
-        removeList: (_, { id }): List => {
+        createList: (_, { name }): List => {
             return new Promise((resolve) => {
-                GroceriesList.findOneAndRemove({ _id: id }, (err, list) => {
-                    if(err) reject(err)
+                const dateNow = (new Date()).toLocaleDateString()
+                new GroceriesList({
+                    archived: false,
+                    createdAt: dateNow,
+                    name: name
+                }).save((err, list) => {
+                    if (err) reject(err)
                     else resolve(list)
                 })
             })
