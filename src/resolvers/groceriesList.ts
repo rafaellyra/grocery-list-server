@@ -1,5 +1,5 @@
-let mongoose = require('mongoose')
-let autoIncrement = require('mongoose-auto-increment')
+import * as mongoose from 'mongoose'
+import * as autoIncrement from 'mongoose-auto-increment'
 
 let connection = mongoose.createConnection('mongodb://localhost:27017/groceriesList')
 autoIncrement.initialize(connection)
@@ -114,6 +114,15 @@ export default {
                 }).save((err, list) => {
                     if (err) reject(err)
                     else resolve(list)
+                })
+            })
+        },
+        createToken: (_, { username, password }): Session => {
+            return new Promise((resolve) => {
+                console.log(username, password)
+                resolve({
+                    'token': 'loremnoxaveco99',
+                    error: null
                 })
             })
         },
