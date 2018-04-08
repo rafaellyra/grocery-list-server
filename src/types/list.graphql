@@ -15,6 +15,11 @@ type ListItem {
     name: String
 }
 
+type Session {
+    token: String
+    error: String
+}
+
 type Mutation {
     addItemToList(id: ID, name: String!, listId: ID): ListItem
     archiveList(id: ID): List

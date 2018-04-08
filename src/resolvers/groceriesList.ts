@@ -1,5 +1,5 @@
-let mongoose = require('mongoose')
-let autoIncrement = require('mongoose-auto-increment')
+import * as mongoose from 'mongoose'
+import * as autoIncrement from 'mongoose-auto-increment'
 
 let connection = mongoose.createConnection('mongodb://localhost:27017/groceriesList')
 autoIncrement.initialize(connection)
