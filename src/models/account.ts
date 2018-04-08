@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose'
-import * as passportLocalMongoose from 'passport-local-mongoose';
+import * as passportLocalMongoose from 'passport-local-mongoose'
 
 import { PassportLocalSchema } from 'mongoose'
 

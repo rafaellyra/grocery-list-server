@@ -117,15 +117,6 @@ export default {
                 })
             })
         },
-        createToken: (_, { username, password }): Session => {
-            return new Promise((resolve) => {
-                console.log(username, password)
-                resolve({
-                    'token': 'loremnoxaveco99',
-                    error: null
-                })
-            })
-        },
         toggleListItem: (_, { id, checked }): Item => {
             return new Promise((resolve) => {
                 ListItem.findByIdAndUpdate(id, { 'checked': checked }, { new: true }, (err, item) => {

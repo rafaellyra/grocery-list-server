@@ -24,7 +24,6 @@ type Mutation {
     addItemToList(id: ID, name: String!, listId: ID): ListItem
     archiveList(id: ID): List
     createList(name: String!, id: ID): List
-    createToken(username: String!, password: String!): Session
     toggleListItem(id: ID, checked: Boolean): ListItem
 }
 
