@@ -54,8 +54,8 @@ app.post('/login', cors(), function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 
-    passport.authenticate('local', function(err, user, info) {
-        if (err) { return next(err); }
+    passport.authenticate('local', function(err, user) {
+        if (err) { return next(err) }
         if (!user) { return res.send('User not found'); }
         req.logIn(user, function(err) {
             if (err) { return next(err); }
@@ -66,15 +66,20 @@ app.post('/login', cors(), function(req, res, next) {
 
 app.options('/register', cors())
 app.use('/register', express.json())
-app.post('/register', cors(), function(req, res) {
+app.post('/register', cors(), function(req, res, next) {
     Account.register(new Account({ username : req.body.username }), req.body.password, function(err, account) {
         if (err) {
-            return res.render('register', { account : account });
+            return res.status(500).send(err)
         }
 
-        passport.authenticate('local')(req, res, function () {
-            res.render('login', { user : req.user });
-        });
+        passport.authenticate('local', function(err, user) {
+            if (err) { return next(err) }
+            if (!user) { return res.send('User not found'); }
+            req.logIn(user, function(err) {
+                if (err) { return next(err); }
+                return res.send(user);
+            });
+        })(req, res, next);
     });
 });
 
