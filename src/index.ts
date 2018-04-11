@@ -4,17 +4,21 @@ import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
 import * as cors from 'cors'
 
+
 // GraphQL imports
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express'
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas'
 import { makeExecutableSchema } from 'graphql-tools'
 import * as path from 'path'
 
+// App imports
+import { Routes } from './routes'
+
 // Authentication impots
 import * as passport from 'passport'
-import * as mongoose from 'mongoose'
+import Account from './models/account'
 
-const app = express();
+const app = express()
 
 // GraphQL Schema Setup
 const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './types'), { recursive: true }))
@@ -25,24 +29,23 @@ const schema = makeExecutableSchema({
 });
 
 // Authentication Setup
-const LocalStrategy = require('passport-local').Strategy;
-const Account = require('./models/account')
+const LocalStrategy = require('passport-local').Strategy
+
 app.use(cookieParser());
 app.use(require('express-session')({
     secret: 'token',
     resave: false,
     saveUninitialized: false
 }))
+
 app.use(passport.initialize())
 app.use(passport.session())
+app.use('/login', Routes)
 
 // Passport config
 passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
-
-// mongoose
-mongoose.connect('mongodb://localhost:27017/groceriesList');
 
 // App initialization
 app.use('/graphql', bodyParser.json(), cors(), graphqlExpress({ schema }))

@@ -1,13 +1,21 @@
-import * as mongoose from 'mongoose'
+import { mongoose } from "../config/database"
+import { Document } from 'mongoose'
 import * as passportLocalMongoose from 'passport-local-mongoose'
 
 import { PassportLocalSchema } from 'mongoose'
 
-const Account = new mongoose.Schema({
+export interface IAccount extends Document {
+    username: string
+    password: string
+}
+
+let schema = new mongoose.Schema({
     username: String,
     password: String,
 });
 
-Account.plugin(passportLocalMongoose);
+schema.plugin(passportLocalMongoose)
 
-module.exports = mongoose.model('Account', Account);
+const Account = mongoose.model<IAccount>('Account', schema)
+
+export default Account
