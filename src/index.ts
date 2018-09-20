@@ -1,23 +1,22 @@
-// Express imports
+// Express
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
 import * as cors from 'cors'
 
-
-// GraphQL imports
+// GraphQL
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express'
 import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas'
 import { makeExecutableSchema } from 'graphql-tools'
 import * as path from 'path'
 
-// App imports
-import {LoginRoutes, RegisterRoutes,} from './routes'
+// App
+import { LoginRoutes, RegisterRoutes } from './routes'
 
-// Authentication impots
-import * as passport from 'passport'
-import Account from './models/account'
-import {Register} from "ts-node";
+// Authentication imports
+// import * as passport from 'passport'
+// import Account from './models/account'
+
 
 const app = express()
 
@@ -30,8 +29,8 @@ const schema = makeExecutableSchema({
 });
 
 // Authentication Setup
-const LocalStrategy = require('passport-local').Strategy
 
+// APP INITIALIZATION
 app.use(cookieParser());
 app.use(require('express-session')({
     secret: 'token',
@@ -39,20 +38,17 @@ app.use(require('express-session')({
     saveUninitialized: false
 }))
 
-app.use(passport.initialize())
-app.use(passport.session())
+// AUTH
 
+// CORS / JSON
 app.options('*', cors())
 app.use(express.json())
+
+// APP ROUTES
 app.use(LoginRoutes)
 app.use(RegisterRoutes)
 
-// Passport config
-passport.use(new LocalStrategy(Account.authenticate()));
-passport.serializeUser(Account.serializeUser());
-passport.deserializeUser(Account.deserializeUser());
-
-// App initialization
+// GraphQL Explorer
 app.use('/graphql', bodyParser.json(), cors(), graphqlExpress({ schema }))
 app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
