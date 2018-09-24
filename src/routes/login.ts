@@ -1,22 +1,28 @@
 import * as cors from 'cors'
-import { Router, Request, Response } from 'express'
-import * as passport from 'passport'
+import { NextFunction, Router, Request, Response } from 'express'
+import { auth } from '../config/database'
 const router: Router = Router()
 
 /* GET home page. */
 router.all('/login', cors(), login)
-function login(req: Request, res: Response, next) {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+function login(req: Request, res: Response, next: NextFunction) {
+    // TODO:   Guard against CSRF attacks
+    let body = ''
+    req.on('data', (chunk) => {
+        body += chunk.toString()
+    })
 
-    passport.authenticate('local', function(err, user) {
-        if (err) { return next(err) }
-        if (!user) { return res.send('User not found') }
-        req.logIn(user, function(err) {
-            if (err) { return next(err); }
-            return res.send(user);
-        });
-    })(req, res, next);
+    req.on('end', () => {
+        // Set session expiration to 5 days.
+        const expiresIn = 60 * 60 * 24 * 5 * 1000
+
+        console.log('token', body)
+        auth.createSessionCookie(body, { expiresIn }).then((sessionToken: string) => {
+            res.json({ sessionToken: sessionToken })
+        }).catch((error) => {
+            console.log('catch', error)
+        })
+    })
 }
 
 export const LoginRoutes: Router = router

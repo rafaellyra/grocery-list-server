@@ -18,5 +18,6 @@ export const firebase = admin.initializeApp({
 //     messagingSenderId: '846750448866'
 // })
 //
+
 export const databaseRef = firebase.database().ref()
 export const auth  = firebase.auth()

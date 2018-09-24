@@ -14,6 +14,7 @@ import * as path from 'path'
 import { LoginRoutes, RegisterRoutes } from './routes'
 
 // Authentication imports
+import { auth } from './config/database'
 // import * as passport from 'passport'
 // import Account from './models/account'
 
@@ -32,11 +33,6 @@ const schema = makeExecutableSchema({
 
 // APP INITIALIZATION
 app.use(cookieParser());
-app.use(require('express-session')({
-    secret: 'token',
-    resave: false,
-    saveUninitialized: false
-}))
 
 // AUTH
 
@@ -48,9 +44,20 @@ app.use(express.json())
 app.use(LoginRoutes)
 app.use(RegisterRoutes)
 
+
+function authMiddleware(req, res, next) {
+    if (!req.cookies.ID_TOKEN) {
+        throw new Error('Authentication failed')
+    }
+
+    // auth.verifySessionCookie()
+    console.log(req.cookies)
+    next()
+}
+
 // GraphQL Explorer
 app.use('/graphql', bodyParser.json(), cors(), graphqlExpress({ schema }))
-app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
+app.use('/graphiql', authMiddleware, graphiqlExpress({ endpointURL: '/graphql' }))
 
 app.listen(9001, () => {
     console.log('GraphQL server is running on http://localhost:9001/graphql')

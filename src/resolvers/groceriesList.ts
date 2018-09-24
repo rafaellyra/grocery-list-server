@@ -1,22 +1,21 @@
-// import * as mongoose from 'mongoose'
-// import * as autoIncrement from 'mongoose-auto-increment'
-
 import { auth, databaseRef } from '../config/database'
 import { List } from '../../../groceries-list/src/app/store'
-
 
 let listsDatabaseRef = databaseRef.child('lists')
 let userId: string
 
-auth.verifyIdToken('eyJhbGciOiJSUzI1NiIsImtpZCI6IjE3ZTBmNDI1NjRlYjc0Y2FlNGZkNDhiZGE5ZjA0YmE2OTRmNDExNDQifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZ3JvY2VyaWVzLWFwcC1jODJiMiIsIm5hbWUiOiJSYWZhZWwgTHlyYSIsInBpY3R1cmUiOiJodHRwczovL2xoNi5nb29nbGV1c2VyY29udGVudC5jb20vLXd6RloyeFhGdElZL0FBQUFBQUFBQUFJL0FBQUFBQUFBQkpVL2g0RGl1MlhscUtvL3Bob3RvLmpwZyIsImF1ZCI6Imdyb2Nlcmllcy1hcHAtYzgyYjIiLCJhdXRoX3RpbWUiOjE1Mzc0NTU3MzgsInVzZXJfaWQiOiJaMVdINzZ3dGtaTk5RTVJSNTFtQmdSSnBVYjYzIiwic3ViIjoiWjFXSDc2d3RrWk5OUU1SUjUxbUJnUkpwVWI2MyIsImlhdCI6MTUzNzQ1NTczOCwiZXhwIjoxNTM3NDU5MzM4LCJlbWFpbCI6InJhZmFlbEByYWZhZWxseXJhLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTA5NjY0MzY1MzYzODIyMzcxNzAxIl0sImVtYWlsIjpbInJhZmFlbEByYWZhZWxseXJhLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.N_PinKR9fyDYXkmrip5lsXT5uRMY_QOpS_TjgQsHqj_E0Kl2e7_kM-kR8XfU9j2qELI6G5p4nXKRmnECMJezNqfnDFYvMmnaYQA8gurBd1e2ekMGlyDTvf234KBDhMC-m2dtSVsHcDgo3ddvYD7JSEHyDvTqkgUn4G1skI9dI1Yd-j97BMVpy0i40Fa9sR6dXXDorX19DZllicCqnk2pFwEvQwj5LbguOLQ9__J6ld6GP4IzEJNnIjDXhd-yeuFE5LOotCOStbsheJklWgsba67wQu0vYE_2dOOAiQfbdYqy2T4FzDOaH_Q9ADiZeET2q4ZRbO7GfSbPshmeC5ZM-g')
-    .then(function(decodedToken) {
-        userId = decodedToken.uid
-        // ...
-    }).catch(function(error) {
+const idToken = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjE3ZTBmNDI1NjRlYjc0Y2FlNGZkNDhiZGE5ZjA0YmE2OTRmNDExNDQifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vZ3JvY2VyaWVzLWFwcC1jODJiMiIsIm5hbWUiOiJSYWZhZWwgTHlyYSIsInBpY3R1cmUiOiJodHRwczovL2xoNi5nb29nbGV1c2VyY29udGVudC5jb20vLXd6RloyeFhGdElZL0FBQUFBQUFBQUFJL0FBQUFBQUFBQkpVL2g0RGl1MlhscUtvL3Bob3RvLmpwZyIsImF1ZCI6Imdyb2Nlcmllcy1hcHAtYzgyYjIiLCJhdXRoX3RpbWUiOjE1Mzc0NTU3MzgsInVzZXJfaWQiOiJaMVdINzZ3dGtaTk5RTVJSNTFtQmdSSnBVYjYzIiwic3ViIjoiWjFXSDc2d3RrWk5OUU1SUjUxbUJnUkpwVWI2MyIsImlhdCI6MTUzNzQ4MzY3OCwiZXhwIjoxNTM3NDg3Mjc4LCJlbWFpbCI6InJhZmFlbEByYWZhZWxseXJhLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTA5NjY0MzY1MzYzODIyMzcxNzAxIl0sImVtYWlsIjpbInJhZmFlbEByYWZhZWxseXJhLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6Imdvb2dsZS5jb20ifX0.hglK0LztScpNvmuUT54Qz68Uul15Pm9C9UxxCMPia7-mEyFrGXcWOezn2uT8p5knIqI0Eyf3cqNQfCDXQHkP42HzQFCpi5eETn_Sw_bNQxSsmdnTpNDFVhoGaMbiBOY4v4Tf3oxKcmtTTGSZK78wO1_emh6clXwnxhFfIVGd4M6UATHZcCbPvzDzCi-GtW0ILGP4JP_myGInmm1A5Z23ajRVuFWOfQX0iO1ZQuSXETZHZSTIj6IAV7SC0KSsGDpyQFRVAliC_U3cpLB_luK6pIMS9nRmON9nH_8TxowapT2-s0feMeIYFwTEUd2lx7y4H89hEvwKCmudtnoELFUQZQ'
+
+function verifyToken(token: string) {
+    auth.verifyIdToken(idToken)
+        .then(function(decodedToken) {
+            userId = decodedToken.uid
+            // ...
+        }).catch(function(error) {
         console.log(error)
         // Handle error
     })
-
+}
 // let connection = mongoose.createConnection('mongodb://localhost:27017/groceriesList')
 // autoIncrement.initialize(connection)
 //
@@ -122,6 +121,7 @@ export default {
         //     })
         // },
         createList: (_, { name  }): List => {
+            console.log(_)
             return new Promise((resolve) => {
                 const dateNow = new Date().toLocaleDateString()
                 let userRef = listsDatabaseRef.child(userId)
@@ -143,19 +143,6 @@ export default {
                     name: name
                 })
             })
-
-
-            // return new Promise((resolve) => {
-            //     const dateNow = (new Date()).toLocaleDateString()
-            //     // new GroceriesList({
-            //     //     archived: false,
-            //     //     createdAt: dateNow,
-            //     //     name: name
-            //     // }).save((err, list) => {
-            //     //     if (err) reject(err)
-            //     //     else resolve(list)
-            //     // })
-            // })
         },
         // toggleListItem: (_, { id, checked }): Item => {
         //     return new Promise((resolve) => {
