@@ -3,8 +3,14 @@ import { NextFunction, Router, Request, Response } from 'express'
 import { auth } from '../config/database'
 const router: Router = Router()
 
-/* GET home page. */
-router.all('/login', cors(), login)
+router.all('/login', cors({
+    credentials: true,
+    origin: (origin, callback) => {
+        console.log(origin)
+        callback(null, true)
+    },
+    optionsSuccessStatus: 200
+}), login)
 function login(req: Request, res: Response, next: NextFunction) {
     // TODO:   Guard against CSRF attacks
     let body = ''
@@ -16,11 +22,16 @@ function login(req: Request, res: Response, next: NextFunction) {
         // Set session expiration to 5 days.
         const expiresIn = 60 * 60 * 24 * 5 * 1000
 
-        console.log('token', body)
-        auth.createSessionCookie(body, { expiresIn }).then((sessionToken: string) => {
-            res.json({ sessionToken: sessionToken })
+        auth.createSessionCookie(body, { expiresIn }).then((sessionCookie: string) => {
+            const options = {
+                maxAge: expiresIn,
+                httpOnly: true
+            }
+            res.cookie('SESSION', sessionCookie, options)
+            // res.end(JSON.stringify({ status: 'success'}))
+            res.json({ status: 'success' })
         }).catch((error) => {
-            console.log('catch', error)
+            console.warn('catch', error)
         })
     })
 }

@@ -18,8 +18,9 @@ import { auth } from './config/database'
 // import * as passport from 'passport'
 // import Account from './models/account'
 
-
 const app = express()
+// APP INITIALIZATION
+app.use(cookieParser());
 
 // GraphQL Schema Setup
 const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './types'), { recursive: true }))
@@ -29,12 +30,23 @@ const schema = makeExecutableSchema({
     resolvers,
 });
 
-// Authentication Setup
-
-// APP INITIALIZATION
-app.use(cookieParser());
 
 // AUTH
+function authMiddleware(req, res, next) {
+    // auth.verifySessionCookie()
+
+    if (!req.cookies.SESSION) {
+        throw new Error('Authentication failed')
+    }
+
+    auth.verifySessionCookie(
+        req.cookies.SESSION, true).then((decodedClaims) => {
+        console.log(decodedClaims)
+        next()
+    }).catch(() => {
+        throw new Error('Session cookie is unavailable or invalid.')
+    })
+}
 
 // CORS / JSON
 app.options('*', cors())
@@ -44,16 +56,6 @@ app.use(express.json())
 app.use(LoginRoutes)
 app.use(RegisterRoutes)
 
-
-function authMiddleware(req, res, next) {
-    if (!req.cookies.ID_TOKEN) {
-        throw new Error('Authentication failed')
-    }
-
-    // auth.verifySessionCookie()
-    console.log(req.cookies)
-    next()
-}
 
 // GraphQL Explorer
 app.use('/graphql', bodyParser.json(), cors(), graphqlExpress({ schema }))
